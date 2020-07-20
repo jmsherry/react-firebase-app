@@ -3,6 +3,7 @@ import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
 import Typography from "@material-ui/core/Typography";
+import Button from "@material-ui/core/Button";
 // import InputBase from "@material-ui/core/InputBase";
 import { fade, makeStyles } from "@material-ui/core/styles";
 import MenuIcon from "@material-ui/icons/Menu";
@@ -10,6 +11,7 @@ import MenuIcon from "@material-ui/icons/Menu";
 import NavDrawer from "./../nav-drawer/nav-drawer";
 
 import { MenuContext } from "./../../contexts/menu.context";
+import { AuthContext } from "./../../contexts/auth.context";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -69,6 +71,7 @@ const useStyles = makeStyles((theme) => ({
 export default function Header() {
   const classes = useStyles();
   const { toggle } = useContext(MenuContext);
+  const { user, logout } = useContext(AuthContext);
   return (
     <div className={classes.root}>
       <NavDrawer />
@@ -99,6 +102,16 @@ export default function Header() {
               inputProps={{ "aria-label": "search" }}
             />
           </div> */}
+          <div className={classes.user} style={{ position: "absolute", right: '15px' }}>
+            {user && (
+              <>
+                <span style={{ marginRight: "15px" }}>Hello Admin</span>
+                <Button variant="outlined" color="secondary" onClick={logout}>
+                  Log out
+                </Button>
+              </>
+            )}
+          </div>
         </Toolbar>
       </AppBar>
     </div>

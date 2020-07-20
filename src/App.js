@@ -8,37 +8,44 @@ import {
 } from "react-router-dom";
 import { ToastProvider } from "react-toast-notifications";
 import { AuthProvider } from "./contexts/auth.context";
-// import { PeopleProvider } from "./contexts/people.context";
 import { MenuItemsProvider } from "./contexts/menu-items.context";
-import { MenuProvider } from "./contexts/menu.context";
+import { MenuProvider as NavProvider } from "./contexts/menu.context";
 
 import Menu from "./pages/menu/menu";
 import NotFound from "./pages/404/404";
+import Login from "./pages/login/login";
 import AddMenuItem from "./pages/add-menu-item/add-menu-item";
 import UpdateMenuItem from "./pages/update-menu-item/update-menu-item";
 
+import ProtectedRoute from './components/protected-route/ProtectedRoute';
+
 function App() {
   return (
-    <ToastProvider autoDismiss={true}>
-      <AuthProvider>
-        <MenuItemsProvider>
-          <MenuProvider>
-            <Router>
+    <Router>
+      <ToastProvider autoDismiss={true}>
+        <AuthProvider>
+          <MenuItemsProvider>
+            <NavProvider>
               <Switch>
                 <Route exact path="/" component={Menu} />
-                <Route exact path={`/menu-item/add`} component={AddMenuItem} />
-                <Route
+                <Route exact path="/login" component={Login} />
+                <ProtectedRoute
+                  exact
+                  path={`/menu-item/add`}
+                  component={AddMenuItem}
+                />
+                <ProtectedRoute
                   exact
                   path={`/menu-item/update/:id`}
                   component={UpdateMenuItem}
                 />
                 <Route path="*" component={NotFound} />
               </Switch>
-            </Router>
-          </MenuProvider>
-        </MenuItemsProvider>
-      </AuthProvider>
-    </ToastProvider>
+            </NavProvider>
+          </MenuItemsProvider>
+        </AuthProvider>
+      </ToastProvider>
+    </Router>
   );
 }
 

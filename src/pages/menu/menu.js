@@ -22,7 +22,7 @@ function MenuPage() {
           {items?.length ? (
             <Menu items={items} />
           ) : (
-            <NoResults dataName="Menu" />
+            <NoResults dataName="Menu Items" />
           )}
         </PageFrame>
       </main>

@@ -1,88 +1,105 @@
-import React, { createContext, useState } from "react";
+import React, { createContext, useState, /* useContext, */ useEffect } from "react";
 import { useToasts } from "react-toast-notifications";
-import { v4 as uuidv4 } from "uuid";
+// import { v4 as uuidv4 } from "uuid";
 // import cloneDeep from 'lodash.cloneDeep' <-- use if your objects get complex
-// import {PeopleContext} from './people.context';
+import { useCollection } from "react-firebase-hooks/firestore";
+import firebase from "./firebase";
+// import { AuthContext } from "./auth.context";
 
 export const MenuItemsContext = createContext({
   addItem: () => {},
   updateItem: () => {},
   deleteItem: () => {},
   items: [],
+  loading: false,
+  error: false,
 });
 
 export const MenuItemsProvider = (props) => {
   const [items, setItems] = useState([]);
+  // const [err, setErr] = useState(null);
+  // const [loading, setLoading] = useState(false);
+  // const [loaded, setLoaded] = useState(false);
+  // const [error, setError] = useState(false);
   // const [search, setSearch] = useState("");
   const { addToast } = useToasts();
-  // const { people } = useContext(PeopleContext);
+  // const { user } = useContext(AuthContext);
+  const collection = firebase.firestore().collection("menu-items");
+  
+  const [snapshot, loading, error] = useCollection(collection, {
+    snapshotListenOptions: { includeMetadataChanges: true },
+  });
+
+  useEffect(() => {
+    if (error) {
+  //     setError(err);
+  console.log(error)
+  addToast(`Error: ${error}`, {
+    appearance: "error",
+  });
+    }
+  }, [error, addToast]);
+
+  useEffect(() => {
+    if (snapshot) {
+
+      setItems(
+        snapshot.docs.map((doc) => Object.assign({ id: doc.id }, doc.data()))
+      );
+      // setLoaded(true);
+
+    }
+  }, [snapshot /*, loaded */]);
+
+  // console.log("user", user);
+  // setItems()
 
   const addItem = async (formData) => {
-   
-      const newItem = { ...formData, _id: uuidv4() };
-      console.log("new item", newItem);
-      setItems([...items, newItem]);
-      addToast(`Added ${newItem.name}`, {
+    try {
+      collection.add(formData);
+      addToast(`Added ${formData.name}`, {
         appearance: "success",
       });
+    } catch (err) {
+      console.log(err)
+      addToast(`Error Adding ${formData.name}`, {
+        appearance: "error",
+      });
+    }
   };
 
-  const updateItem = async (id, updates, fullOwner) => {
-    console.log("here", id, updates);
-   
-      // Get index
-      const index = items.findIndex((item) => item._id === id);
+  const updateItem = async (original, updates) => {
+    console.log("updateItem", original, updates);
 
-      // Get actual item
-      const oldItem = items[index];
-      console.log("here", oldItem);
-      // Merge with updates
-      const newItem = {
-        ...oldItem,
-        ...updates, // order here is important for the override!!
-      };
+    collection.doc(original.id).update(updates);
 
-      // this is a bit sketchy, but shouldn't go out of line
-      if(typeof newItem.owner === 'string') {
-        newItem.owner = fullOwner;
-      }
+    addToast(`Updated ${original.name}`, {
+      appearance: "success",
+    });
+  };
 
-      console.log("here", newItem);
-      // recreate the items array
-      const updatedItems = [
-        ...items.slice(0, index),
-        newItem,
-        ...items.slice(index + 1),
-      ];
-      
-      setItems(updatedItems);
-      addToast(`Updated ${newItem.name}`, {
+  const deleteItem = async (id) => {
+    console.log("delete id", id);
+    const { name } = items.find((item) => item.id === id);
+    try {
+      collection.doc(id).delete();
+      addToast(`Deleted ${name}`, {
         appearance: "success",
       });
-  };
-
-  const deleteItem = async (id) => {  
-      // Get index
-      const index = items.findIndex((item) => item._id === id);
-      const deletedItem = items[index];
-      // recreate the items array without that item
-      const updatedItems = [
-        ...items.slice(0, index),
-        ...items.slice(index + 1),
-      ];
-      setItems(updatedItems);
-      addToast(
-        `Deleted ${deletedItem.name}`,
-        {
-          appearance: "success",
-        }
-      );
+    } catch (err) {
+      console.error(err);
+      addToast(`Error deleting ${name}`, {
+        appearance: "error",
+      });
+    }
   };
 
   return (
     <MenuItemsContext.Provider
       value={{
         items,
+        loading,
+        error,
         addItem,
         updateItem,
         deleteItem,

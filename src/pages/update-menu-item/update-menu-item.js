@@ -10,7 +10,7 @@ function UpdateItems() {
   const { items } = useContext(MenuItemsContext);
   console.log("Items", items);
 
-  const ItemToBeUpdated = items.find((Item) => Item._id === id);
+  const ItemToBeUpdated = items.find((item) => item.id === id);
   console.log("ItemToBeUpdated", ItemToBeUpdated);
   return (
     <div className="App">

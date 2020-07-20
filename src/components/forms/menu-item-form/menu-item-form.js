@@ -1,4 +1,4 @@
-import React, { useContext, useState, /* useEffect */ } from "react";
+import React, { useContext, useState /* useEffect */ } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import {
   Button,
@@ -10,7 +10,7 @@ import {
 import { yupResolver } from "@hookform/resolvers";
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 
 import { MenuItemsContext } from "../../../contexts/menu-items.context";
 
@@ -31,19 +31,13 @@ const useStyles = makeStyles((theme) => ({
 function MenuItemForm({ initialValues }) {
   const classes = useStyles();
   let { id } = useParams();
+  const history = useHistory();
   const [populated, setPopulated] = useState(false);
   const { addItem, updateItem } = useContext(MenuItemsContext);
   const resetValues = {
     name: "",
     description: "",
   };
-
-  // useEffect(() => {
-  //   console.log("in useEffect", people, peopleLoaded);
-  //   if (!peopleLoaded) {
-  //     fetchPeople();
-  //   }
-  // }, [peopleLoaded, fetchPeople, people]);
 
   // const ids = people.map((person) => person._id); // tags checked here
   const schema = yup.object().shape({
@@ -70,27 +64,24 @@ function MenuItemForm({ initialValues }) {
   // console.log("errors", errors);
   const onSubmit = async (formValues) => {
     console.log("formValues", formValues);
-    // formValues._id = id; // pulled from the URL using router 'useParams' hook
 
     if (populated) {
       const updates = {};
       for (const key in initialValues) {
         if (initialValues.hasOwnProperty(key)) {
-          if (initialValues[key] !== formValues[key] && key[0] !== '_') {
+          if (initialValues[key] !== formValues[key] && key[0] !== "_" && key !== 'id') {
             updates[key] = formValues[key];
           }
         }
       }
-
-      console.log("updates", updates);
-      const args = [id, updates];
-
-      
-      updateItem(...args);
+      formValues.id = id; // pulled from the URL using router 'useParams' hook
+      updateItem(formValues, updates);
+      history.push(`/`);
     } else {
       addItem(formValues);
+      reset(resetValues);
     }
-    reset(resetValues);
+    
   };
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
