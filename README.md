@@ -1,3 +1,11 @@
+# React Firebase Example
+
+This repo has, on the master branch, an example of a typical react CRUD app
+
+On the `serverless-db` it integrates with firebase auth and firestore to make that realtime and authenticated
+
+---
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
