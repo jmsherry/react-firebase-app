@@ -2,7 +2,7 @@
 
 This repo has, on the master branch, an example of a typical react CRUD app
 
-On the `serverless-db` it integrates with firebase auth and firestore to make that realtime and authenticated
+On the `serverless-db` branch it integrates with firebase auth and firestore to make that realtime and authenticated
 
 ---
 
