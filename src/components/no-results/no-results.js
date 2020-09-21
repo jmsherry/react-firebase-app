@@ -1,7 +1,7 @@
 import React from "react";
 
 const NoResults = ({
-  customText = "There are no",
+  customText = "There is no",
   dataName = "items",
   tag: Tag = "p",
 }) => (
