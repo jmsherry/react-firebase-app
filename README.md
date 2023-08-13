@@ -1,5 +1,7 @@
 # React Firebase Example
 
+**React version must be 16 or less!!**
+
 This repo has, on the master branch, an example of a typical react CRUD app
 
 On the `serverless-db` branch it integrates with firebase auth and firestore to make that realtime and authenticated
